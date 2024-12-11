@@ -2,22 +2,23 @@ import java.io.*;
 import java.security.MessageDigest;
 import java.util.Scanner;
 
-public class User {
+public class User extends Person implements UserOperations {
+
     private String username;
     private String password; // Hashed password
-    private String name;
     private String email;
 
     // Constructor
     public User(String username, String password, String name, String email) {
+        super(name);
         this.username = username;
         this.password = password;
-        this.name = name;
         this.email = email;
     }
 
-    // Register user
-    public static void registerUser(String username, String password, String name, String email) {
+    // Register user with hashed password
+    @Override
+    public void register(String username, String password, String name, String email) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter("users.txt", true))) {
             String hashedPassword = hashPassword(password); // Hash the password before storing
             bw.write(username + "," + hashedPassword + "," + name + "," + email);
@@ -47,31 +48,27 @@ public class User {
     }
 
     // Login validation
-    // User Login (Terminal-based input)
-    public static String userLogin() {
-        Scanner sc = new Scanner(System.in);
+    @Override
+    public boolean login(String username, String password) throws Exception {
+        try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] userData = line.split(",");
+                String storedUsername = userData[0];
+                String storedHashedPassword = userData[1];
 
-        System.out.print("Enter username: ");
-        String username = sc.nextLine();
-        System.out.print("Enter password: ");
-        String password = sc.nextLine();
-
-        try {
-            if (login(username, password)) {
-                System.out.println("Login Successful!");
-                return username;  // Return the username on successful login
-            } else {
-                System.out.println("Invalid credentials!");
-                return null;  // Return null if login fails
+                if (storedUsername.equals(username) && storedHashedPassword.equals(hashPassword(password))) {
+                    return true; // User found and password matches
+                }
             }
-        } catch (Exception e) {
-            System.out.println("Error during login: " + e.getMessage());
-            return null;
+        } catch (IOException e) {
+            System.out.println("Error reading user data: " + e.getMessage());
         }
+        return false; // User not found or password doesn't match
     }
 
     // Hash password using SHA-256
-    public static String hashPassword(String password) throws Exception {
+    private String hashPassword(String password) throws Exception {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         byte[] hash = md.digest(password.getBytes("UTF-8"));
         StringBuilder hexString = new StringBuilder();
@@ -106,25 +103,8 @@ public class User {
             return;
         }
 
-        registerUser(username, password, name, email);
-    }
-
-    // User Login (Terminal-based input)
-    public static boolean login(String username, String password) throws Exception {
-        try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] userData = line.split(",");
-                String storedUsername = userData[0];
-                String storedHashedPassword = userData[1];
-
-                if (storedUsername.equals(username) && storedHashedPassword.equals(hashPassword(password))) {
-                    return true; // User found and password matches
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading user data: " + e.getMessage());
-        }
-        return false; // User not found or password doesn't match
+        // Create user object and register
+        User user = new User(username, password, name, email);
+        user.register(username, password, name, email);
     }
 }

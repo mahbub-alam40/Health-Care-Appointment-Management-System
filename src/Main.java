@@ -1,5 +1,5 @@
 import java.io.*;
-import java.util.*;
+import java.util.Scanner;
 
 public class Main {
 
@@ -27,6 +27,12 @@ public class Main {
             switch (choice) {
                 case 1:
                     // Register a new user
+                    System.out.print("Enter your first name: ");
+                    String firstName = sc.nextLine();
+
+                    System.out.print("Enter your last name: ");
+                    String lastName = sc.nextLine();
+
                     System.out.print("Enter a new username: ");
                     username = sc.nextLine();
 
@@ -39,10 +45,11 @@ public class Main {
                     System.out.print("Enter a new password: ");
                     password = sc.nextLine();
 
-                    // Register the user
-                    registerUser(username, password);
+                    // Register the user (static method)
+                    register(firstName, lastName, username, password);
                     System.out.println("Registration successful!");
                     break;
+
 
                 case 2:
                     // Login an existing user
@@ -89,7 +96,6 @@ public class Main {
             }
         }
     }
-
     // Method to check if a user already exists in the users.txt file
     public static boolean checkUserExists(String username) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader("users.txt"));
@@ -106,10 +112,10 @@ public class Main {
         return false;  // User does not exist
     }
 
-    // Method to register a user by adding their username and password to the users.txt file
-    public static void registerUser(String username, String password) throws IOException {
+    // Static method to register a user by adding their username and password to the users.txt file
+    public static void register(String firstName, String lastName, String username, String password) throws IOException {
         BufferedWriter bw = new BufferedWriter(new FileWriter("users.txt", true));
-        bw.write(username + "," + password);
+        bw.write(username + "," + password + "," + firstName + "," + lastName); // Saving first name, last name, and username/password
         bw.newLine();
         bw.close();
     }
@@ -172,7 +178,6 @@ public class Main {
             }
         }
     }
-
     // Method to view all appointments
     public static void viewAppointments() throws IOException {
         File inputFile = new File("appointments.txt");
@@ -196,6 +201,7 @@ public class Main {
             }
         }
     }
+
 
     // Method to view all doctors
     public static void viewDoctors() throws IOException {
@@ -265,7 +271,8 @@ public class Main {
         }
     }
 
-    // Method to show main menu options after successful login
+
+    // Method to show main menu options after successful user login
     public static void showMainMenu(String username) throws IOException {
         Scanner sc = new Scanner(System.in);
 

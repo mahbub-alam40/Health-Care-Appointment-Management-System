@@ -3,12 +3,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Doctor {
-    private String name;
+public class Doctor extends Person {
 
     // Constructor
     public Doctor(String name) {
-        this.name = name;
+        super(name);
     }
 
     // Add a doctor to the list
@@ -36,9 +35,13 @@ public class Doctor {
     // Display the list of doctors with numbers for selection
     public static void displayDoctors() throws IOException {
         List<String> doctors = loadDoctors();
-        System.out.println("Available Doctors:");
-        for (int i = 0; i < doctors.size(); i++) {
-            System.out.println((i + 1) + ". " + doctors.get(i));
+        if (doctors.isEmpty()) {
+            System.out.println("No doctors available.");
+        } else {
+            System.out.println("Available Doctors:");
+            for (int i = 0; i < doctors.size(); i++) {
+                System.out.println((i + 1) + ". " + doctors.get(i));
+            }
         }
     }
 
